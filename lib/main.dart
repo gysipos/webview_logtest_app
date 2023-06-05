@@ -48,21 +48,27 @@ class _MyHomePageState extends State<MyHomePage> {
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setNavigationDelegate(NavigationDelegate(
         onPageStarted: (url) {
+          /// If you filer '//wwapp' in logcat, you'll see only these logs
           print('onPageStarted: $url //wwapp');
         },
         onUrlChange: (change) {
+          /// If you filer '//wwapp' in logcat, you'll see only these logs
           print('onUrlChange: ${change.url} //wwapp');
         },
         onProgress: (progress) {
+          /// If you filer '//wwapp' in logcat, you'll see only these logs
           print('onProgress: $progress //wwapp');
         },
         onWebResourceError: (error) {
+          /// If you filer '//wwapp' in logcat, you'll see only these logs
           print('onWebResourceError: $error //wwapp');
         },
         onPageFinished: (url) async {
+          /// If you filer '//wwapp' in logcat, you'll see only these logs
           print('onPageFinished: $url //wwapp');
         },
         onNavigationRequest: (request) async {
+          /// If you filer '//wwapp' in logcat, you'll see only these logs
           print('onNavigationRequest: ${request.url} //wwapp');
           return NavigationDecision.navigate;
         },
