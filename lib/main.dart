@@ -32,6 +32,7 @@ class _MyHomePageState extends State<MyHomePage> {
   late final WebViewController _webViewController;
   late final TextEditingController _textEditingController;
   List<String> history = [];
+  List<String> logs = [];
   late final SharedPreferences sp;
 
   @override
@@ -48,28 +49,22 @@ class _MyHomePageState extends State<MyHomePage> {
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setNavigationDelegate(NavigationDelegate(
         onPageStarted: (url) {
-          /// If you filer '//wwapp' in logcat, you'll see only these logs
-          print('onPageStarted: $url //wwapp');
+          addToLogs('onPageStarted: $url');
         },
         onUrlChange: (change) {
-          /// If you filer '//wwapp' in logcat, you'll see only these logs
-          print('onUrlChange: ${change.url} //wwapp');
+          addToLogs('onUrlChange: ${change.url}');
         },
         onProgress: (progress) {
-          /// If you filer '//wwapp' in logcat, you'll see only these logs
-          print('onProgress: $progress //wwapp');
+          addToLogs('onProgress: $progress');
         },
         onWebResourceError: (error) {
-          /// If you filer '//wwapp' in logcat, you'll see only these logs
-          print('onWebResourceError: $error //wwapp');
+          addToLogs('onWebResourceError: ${error.description}');
         },
         onPageFinished: (url) async {
-          /// If you filer '//wwapp' in logcat, you'll see only these logs
-          print('onPageFinished: $url //wwapp');
+          addToLogs('onPageFinished: $url');
         },
         onNavigationRequest: (request) async {
-          /// If you filer '//wwapp' in logcat, you'll see only these logs
-          print('onNavigationRequest: ${request.url} //wwapp');
+          addToLogs('onNavigationRequest: ${request.url}');
           return NavigationDecision.navigate;
         },
       ));
@@ -77,85 +72,121 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SizedBox(
-        height: MediaQuery.sizeOf(context).height,
-        child: WebViewWidget(
-          controller: _webViewController,
+    return DefaultTabController(
+      length: 2,
+      child: Scaffold(
+        appBar: AppBar(
+          bottom: const TabBar(tabs: [
+            Tab(
+              text: 'Webview',
+            ),
+            Tab(
+              text: 'Logs',
+            ),
+          ]),
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          showDialog(
-              context: context,
-              builder: (context) => Dialog(
-                    child: SizedBox(
-                      height: 600,
-                      child: CustomScrollView(
-                        slivers: [
-                          SliverList(
-                            delegate: SliverChildListDelegate([
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: TextField(
-                                  decoration: const InputDecoration(
-                                      hintText: 'url',
-                                      border: OutlineInputBorder()),
-                                  controller: _textEditingController,
+        body: TabBarView(
+          children: [
+            WebViewWidget(
+              controller: _webViewController,
+            ),
+            ListView.builder(
+              itemBuilder: (context, index) => Padding(
+                padding: const EdgeInsets.all(4.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(logs[index], style: TextStyle(fontSize: 18),),
+                    Divider(thickness: 3,)
+                  ],
+                ),
+              ),
+              itemCount: logs.length,
+            )
+          ],
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            showDialog(
+                context: context,
+                builder: (context) => Dialog(
+                      child: SizedBox(
+                        height: 600,
+                        child: CustomScrollView(
+                          slivers: [
+                            SliverList(
+                              delegate: SliverChildListDelegate([
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: TextField(
+                                    decoration: const InputDecoration(
+                                        hintText: 'url',
+                                        border: OutlineInputBorder()),
+                                    controller: _textEditingController,
+                                  ),
                                 ),
-                              ),
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: ElevatedButton(
+                                    onPressed: () {
+                                      history = [
+                                        _textEditingController.text,
+                                        ...history
+                                      ];
+                                      sp.setStringList(historyKey, history);
+                                      Navigator.pop(context);
+                                      _webViewController.loadRequest(Uri.parse(
+                                          addHttpStuff(
+                                              _textEditingController.text)));
+                                    },
+                                    child: const Text('tőccsed'),
+                                  ),
+                                ),
+                              ]),
+                            ),
+                            SliverList(
+                                delegate: SliverChildBuilderDelegate(
+                                    childCount: history.length,
+                                    (context, index) {
+                              return TextButton(
+                                  onPressed: () {
+                                    _webViewController.loadRequest(Uri.parse(
+                                        addHttpStuff(history[index])));
+                                    Navigator.pop(context);
+                                  },
+                                  child: Text(history[index]));
+                            })),
+                            SliverList(
+                                delegate: SliverChildListDelegate([
                               Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: ElevatedButton(
-                                  onPressed: () {
-                                    history = [
-                                      _textEditingController.text,
-                                      ...history
-                                    ];
-                                    sp.setStringList(historyKey, history);
-                                    Navigator.pop(context);
-                                    _webViewController.loadRequest(Uri.parse(
-                                        addHttpStuff(
-                                            _textEditingController.text)));
-                                  },
-                                  child: const Text('tőccsed'),
-                                ),
-                              ),
-                            ]),
-                          ),
-                          SliverList(
-                              delegate: SliverChildBuilderDelegate(
-                                  childCount: history.length, (context, index) {
-                            return TextButton(
-                                onPressed: () {
-                                  _webViewController.loadRequest(
-                                      Uri.parse(addHttpStuff(history[index])));
-                                  Navigator.pop(context);
-                                },
-                                child: Text(history[index]));
-                          })),
-                          SliverList(
-                              delegate: SliverChildListDelegate([
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: ElevatedButton(
-                                  onPressed: () {
-                                    sp.clear();
-                                    setState(() {
-                                      history = [];
-                                    });
-                                  },
-                                  child: const Text('elfelejtsed!')),
-                            )
-                          ]))
-                        ],
+                                    onPressed: () {
+                                      sp.clear();
+                                      setState(() {
+                                        history = [];
+                                      });
+                                    },
+                                    child: const Text('elfelejtsed!')),
+                              )
+                            ]))
+                          ],
+                        ),
                       ),
-                    ),
-                  ));
-        },
-        child: const Icon(Icons.send),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+                    ));
+          },
+          child: const Icon(Icons.send),
+        ), // This trailing comma makes auto-formatting nicer for build methods.
+      ),
     );
+  }
+
+  void addToLogs(String log) {
+    /// If you filer '//wwapp' in logcat, you'll see only these logs
+    print(log + ' //wwapp');
+    setState(() {
+      logs = [log, ...logs];
+    });
   }
 }
 
