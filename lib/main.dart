@@ -95,25 +95,31 @@ class _MyHomePageState extends State<MyHomePage> {
                         slivers: [
                           SliverList(
                             delegate: SliverChildListDelegate([
-                              TextField(
-                                decoration: InputDecoration(
-                                    hintText: 'url',
-                                    border: OutlineInputBorder()),
-                                controller: _textEditingController,
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: TextField(
+                                  decoration: const InputDecoration(
+                                      hintText: 'url',
+                                      border: OutlineInputBorder()),
+                                  controller: _textEditingController,
+                                ),
                               ),
-                              ElevatedButton(
-                                onPressed: () {
-                                  history = [
-                                    _textEditingController.text,
-                                    ...history
-                                  ];
-                                  sp.setStringList(historyKey, history);
-                                  Navigator.pop(context);
-                                  _webViewController.loadRequest(Uri.parse(
-                                      addHttpStuff(
-                                          _textEditingController.text)));
-                                },
-                                child: const Text('tőccsed'),
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    history = [
+                                      _textEditingController.text,
+                                      ...history
+                                    ];
+                                    sp.setStringList(historyKey, history);
+                                    Navigator.pop(context);
+                                    _webViewController.loadRequest(Uri.parse(
+                                        addHttpStuff(
+                                            _textEditingController.text)));
+                                  },
+                                  child: const Text('tőccsed'),
+                                ),
                               ),
                             ]),
                           ),
@@ -130,14 +136,17 @@ class _MyHomePageState extends State<MyHomePage> {
                           })),
                           SliverList(
                               delegate: SliverChildListDelegate([
-                            ElevatedButton(
-                                onPressed: () {
-                                  sp.clear();
-                                  setState(() {
-                                    history = [];
-                                  });
-                                },
-                                child: const Text('elfelejtsed!'))
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: ElevatedButton(
+                                  onPressed: () {
+                                    sp.clear();
+                                    setState(() {
+                                      history = [];
+                                    });
+                                  },
+                                  child: const Text('elfelejtsed!')),
+                            )
                           ]))
                         ],
                       ),
