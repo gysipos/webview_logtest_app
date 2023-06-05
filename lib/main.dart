@@ -96,8 +96,8 @@ class _MyHomePageState extends State<MyHomePage> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(logs[index], style: TextStyle(fontSize: 18),),
-                    Divider(thickness: 3,)
+                    Align(alignment: Alignment.centerLeft, child: Text(logs[index], style: TextStyle(fontSize: 18),)),
+                    const Divider(thickness: 3,)
                   ],
                 ),
               ),
